@@ -16,13 +16,13 @@ echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
 # ------------ ワークスペースの作成
 apt-get install python3-colcon-common-extensions -y
-mkdir -p ~/ros2_ws/src
-cd ~/ros2_ws/ && colcon build
+mkdir -p ~/share/ros2_ws/src
+cd ~/share/ros2_ws/ && colcon build
 
 # ------------ Gazeboのインストール
 apt-get install gazebo -y
 apt-get install ros-humble-gazebo-* -y
 
 # ------------ 環境設定を反映
-echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc
+echo "source ~/share/ros2_ws/install/setup.bash" >> ~/.bashrc
 source ~/.bashrc
