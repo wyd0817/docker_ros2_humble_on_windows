@@ -14,6 +14,11 @@ apt-get install ros-humble-desktop -y
 # ------------ 環境設定
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
+# ------------ rosdepのインストール
+apt-get install -y python3-rosdep
+rosdep init
+rosdep update
+
 # ------------ ワークスペースの作成
 apt-get install python3-colcon-common-extensions -y
 mkdir -p ~/share/ros2_ws/src

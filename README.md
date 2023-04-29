@@ -1,6 +1,12 @@
 # docker_ros2_humble_on_windows
 ターミナルだけだが，RvizなどのGUIも動く．
 
+## Install dependencies with rosdep
+```
+cd ~/share/ros2_ws/src && rosdep install --from-paths . --ignore-src -r -y
+```
+
+
 ## GUIを使うための設定
 X-serverを使えるようにする
 
