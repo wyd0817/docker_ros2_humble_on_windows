@@ -1,9 +1,20 @@
 # ------------ ベースイメージファイル
-FROM nvidia/cuda:11.7.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
 
+# Add user so we don't need --no-sandbox. 
+# RUN addgroup -S chrome \
+#     && adduser -S -G chrome chrome \
+#     && mkdir -p /home/chrome/Downloads \
+#     && { \
+#     echo "pcm.default pulse"; \
+#     echo "ctl.default pulse"; \
+#     } | tee /home/chrome/.asoundrc \
+#     && chown -R chrome:chrome /home/chrome
+    
 # ------------ 環境設定
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 ENV DISPLAY host.docker.internal:0.0
+ENV PULSE_SERVER=tcp:host.docker.internal:4713
 ENV DEBIAN_FRONTEND=noninteractive
 
 # ------------ タイムゾーンの設定
@@ -32,3 +43,11 @@ RUN pip3 install torch torchvision
 # ------------ ROS2のセットアップ
 COPY setup.sh /root/
 RUN bash ~/setup.sh
+
+# ------------ LLMのセットアップ
+RUN pip install wandb datasets tqdm tiktoken transformers deepspeed openai PyYAML accelerate datasets einops evaluate peft protobuf scikit-learn scipy sentencepiece fire mpi4py
+RUN pip install bs4 zenhan mecab-python3 pyknp
+RUN pip install langchain sentence_transformers faiss-gpu python-dotenv
+
+# ------------ Jupyterのセットアップ
+RUN pip install ipykernel jupyter jupyterlab

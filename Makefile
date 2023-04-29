@@ -13,6 +13,6 @@ rm:
 	docker rm docker_ros2_humble_on_windows
 
 clone:
-	git clone -b humble git@github.com:matsuren/sim_physx_control.git share/ros2_ws/src/sim_physx_control
-	git clone -b humble git@github.com:matsuren/sim_physx_pursuit.git share/ros2_ws/src/sim_physx_pursuit
+	git clone -b humble git@github.com:wyd0817/sim_physx_control.git share/ros2_ws/src/sim_physx_control
+	git clone -b humble git@github.com:wyd0817/sim_physx_pursuit.git share/ros2_ws/src/sim_physx_pursuit
 	git clone -b main-ros2 https://github.com/Unity-Technologies/ROS-TCP-Endpoint.git share/ros2_ws/src/ROS-TCP-Endpoint
