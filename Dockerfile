@@ -1,53 +1,52 @@
-# ------------ ベースイメージファイル
+# ------------ Base Image
 FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
 
-# Add user so we don't need --no-sandbox. 
-# RUN addgroup -S chrome \
-#     && adduser -S -G chrome chrome \
-#     && mkdir -p /home/chrome/Downloads \
-#     && { \
-#     echo "pcm.default pulse"; \
-#     echo "ctl.default pulse"; \
-#     } | tee /home/chrome/.asoundrc \
-#     && chown -R chrome:chrome /home/chrome
     
-# ------------ 環境設定
+# ------------ Environment Settings
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 ENV DISPLAY host.docker.internal:0.0
 ENV PULSE_SERVER=tcp:host.docker.internal:4713
 ENV DEBIAN_FRONTEND=noninteractive
 
-# ------------ タイムゾーンの設定
+# ------------ Set Timezone
 RUN apt-get update && apt-get install -y tzdata
 ENV TZ=Asia/Tokyo 
 
-# ------------ ワークディレクトリの設定
+# ------------ Set Working Directory
 WORKDIR /root
 
-# ------------ Ubuntu上での環境構築
+# ------------ Build Environment on Ubuntu
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y python3 python3-pip
 
-# windows上でx-serverに接続するために必要なx11-appsのインストール
+# Install x11-apps (Required for connecting to X-server on Windows)
 RUN apt-get install x11-apps -y
 
-# gitのインストール（20.04以降はデフォルトでインストールされていない）
+# Install git (Not installed by default on Ubuntu 20.04 and later)
 RUN apt-get install git -y
 
-# matplotlibなどでの描画GUIに必要
+# Required for GUI rendering (e.g., with matplotlib)
 RUN apt-get install python3-tk -y
 
-# PyTorchのためのライブラリをインストール
+# Install libraries required for PyTorch
 RUN pip3 install torch torchvision
 
-# ------------ ROS2のセットアップ
+# ------------ Jupyter Setup
+RUN pip3 install ipykernel jupyter jupyterlab
+
+# ------------ Setup for ROS2 and Navigation2
 COPY setup.sh /root/
 RUN bash ~/setup.sh
 
-# ------------ LLMのセットアップ
-RUN pip install wandb datasets tqdm tiktoken transformers deepspeed openai PyYAML accelerate datasets einops evaluate peft protobuf scikit-learn scipy sentencepiece fire mpi4py
-RUN pip install bs4 zenhan mecab-python3 pyknp
-RUN pip install langchain sentence_transformers faiss-gpu python-dotenv
+# ------------ Install LLM-related Libraries
+RUN pip3 install \
+    wandb datasets tqdm tiktoken transformers deepspeed openai PyYAML accelerate \
+    einops evaluate peft protobuf scikit-learn scipy sentencepiece fire \
+    bs4 zenhan mecab-python3 pyknp \
+    langchain sentence_transformers faiss-gpu python-dotenv \
+    ipykernel jupyter jupyterlab \
+    numpy==1.26.4 scipy==1.8.0 transforms3d==0.4.2 \
+    gradio loguru \
+    langchain_openai langchain_anthropic langchain_groq \
+    SpeechRecognition
 
-# ------------ Jupyterのセットアップ
-RUN pip install ipykernel jupyter jupyterlab
