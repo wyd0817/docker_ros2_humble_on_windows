@@ -1,33 +1,39 @@
 #!/bin/bash -e 
 
-# ------------ apt-getリポジトリの追加
+# ------------ Adding apt-get repositories
 apt-get install curl gnupg lsb-release -y
 curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
 
-# ------------ リポジトリをsource listに追加
+# ------------ Adding repository to source list
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
-# ------------ ROS2インストール
+# ------------ Installing ROS2
 apt-get update
 apt-get install ros-humble-desktop -y
 
-# ------------ 環境設定
+# ------------ Setting up environment
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
-# ------------ rosdepのインストール
+# ------------ Installing rosdep
 apt-get install -y python3-rosdep
 rosdep init
 rosdep update
 
-# ------------ ワークスペースの作成
+# ------------ Creating workspace
 apt-get install python3-colcon-common-extensions -y
 mkdir -p ~/share/ros2_ws/src
 cd ~/share/ros2_ws/ && colcon build
 
-# ------------ Gazeboのインストール
+# ------------ Installing Gazebo
 apt-get install gazebo -y
 apt-get install ros-humble-gazebo-* -y
 
-# ------------ 環境設定を反映
+# ------------ Installing Navigation2
+apt-get install ros-humble-navigation2 ros-humble-nav2-bringup -y
+
+# ------------ Installing tf-transformations
+apt-get install ros-humble-tf-transformations -y
+
+# ------------ Reflecting environment settings
 echo "source ~/share/ros2_ws/install/setup.bash" >> ~/.bashrc
 source ~/.bashrc
