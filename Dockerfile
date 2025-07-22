@@ -28,6 +28,9 @@ RUN apt-get install git -y
 # Required for GUI rendering (e.g., with matplotlib)
 RUN apt-get install python3-tk -y
 
+# Install additional system packages
+RUN apt-get install -y ros-humble-tf-transformations libaio-dev
+
 # Install libraries required for PyTorch
 RUN pip3 install torch torchvision
 
@@ -47,6 +50,5 @@ RUN pip3 install \
     ipykernel jupyter jupyterlab \
     numpy==1.26.4 scipy==1.8.0 transforms3d==0.4.2 \
     gradio loguru \
-    langchain_openai langchain_anthropic langchain_groq \
+    langchain_openai langchain_anthropic langchain_groq langchain-deepseek \
     SpeechRecognition
-
