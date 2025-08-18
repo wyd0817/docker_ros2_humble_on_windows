@@ -42,7 +42,10 @@ RUN pip3 install --no-cache-dir torch torchvision
 
 # ------------ ROS2 setup
 COPY setup.sh /root/
-RUN chmod +x /root/setup.sh && \
+# Fix line endings and execute
+RUN apt-get update && apt-get install -y dos2unix && \
+    dos2unix /root/setup.sh && \
+    chmod +x /root/setup.sh && \
     /root/setup.sh
 
 # ------------ LLM setup

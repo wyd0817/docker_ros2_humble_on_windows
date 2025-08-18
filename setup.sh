@@ -1,33 +1,37 @@
-#!/bin/bash -e 
+#!/bin/bash
+set -e
 
-# ------------ apt-getリポジトリの追加
-apt-get install curl gnupg lsb-release -y
+# ------------ Add apt-get repository
+apt-get update
+apt-get install -y curl gnupg lsb-release
 curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
 
-# ------------ リポジトリをsource listに追加
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(source /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
+# ------------ Add repository to source list
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
-# ------------ ROS2インストール
+# ------------ Install ROS2
 apt-get update
-apt-get install ros-humble-desktop -y
+apt-get install -y ros-humble-desktop
 
-# ------------ 環境設定
+# ------------ Environment setup
 echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 
-# ------------ rosdepのインストール
+# ------------ Install rosdep
 apt-get install -y python3-rosdep
-rosdep init
+if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
+    rosdep init
+fi
 rosdep update
 
-# ------------ ワークスペースの作成
-apt-get install python3-colcon-common-extensions -y
+# ------------ Create workspace
+apt-get install -y python3-colcon-common-extensions
 mkdir -p ~/share/ros2_ws/src
-cd ~/share/ros2_ws/ && colcon build
+cd ~/share/ros2_ws/ && colcon build --symlink-install || true
 
-# ------------ Gazeboのインストール
-apt-get install gazebo -y
-apt-get install ros-humble-gazebo-* -y
+# ------------ Install Gazebo
+apt-get install -y gazebo
+apt-get install -y ros-humble-gazebo-*
 
-# ------------ 環境設定を反映
+# ------------ Apply environment setup
 echo "source ~/share/ros2_ws/install/setup.bash" >> ~/.bashrc
-source ~/.bashrc
+echo "ROS2 Humble setup complete"
