@@ -16,17 +16,18 @@ RUN apt-get update && \
 # ------------ Set working directory
 WORKDIR /root
 
-# ------------ Add ROS 2 repository
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
+# ------------ Add ROS 2 repository (with retry logic for network resilience)
+RUN apt-get update --fix-missing && \
+    apt-get install -y --fix-missing software-properties-common && \
     add-apt-repository universe && \
-    apt-get update && apt-get install -y curl gpg && \
+    apt-get update --fix-missing && \
+    apt-get install -y --fix-missing curl gpg && \
     curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 # ------------ Build environment on Ubuntu
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y \
+RUN apt-get update --fix-missing && apt-get upgrade -y && \
+    apt-get install -y --fix-missing \
     python3 \
     python3-pip \
     x11-apps \
@@ -44,7 +45,7 @@ RUN pip3 install --no-cache-dir torch torchvision
 # ------------ ROS2 setup
 COPY setup.sh /root/
 # Fix line endings and execute
-RUN apt-get update && apt-get install -y dos2unix && \
+RUN apt-get update --fix-missing && apt-get install -y --fix-missing dos2unix && \
     dos2unix /root/setup.sh && \
     chmod +x /root/setup.sh && \
     /root/setup.sh
@@ -108,7 +109,7 @@ RUN pip3 install --no-cache-dir \
 
 # ------------ Install TensorRT-LLM for High-Performance Inference
 # Install additional system dependencies for TensorRT-LLM
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update --fix-missing && apt-get install -y --fix-missing --no-install-recommends \
     openmpi-bin libopenmpi-dev git-lfs && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
