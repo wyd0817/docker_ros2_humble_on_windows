@@ -33,6 +33,7 @@ RUN apt-get update && apt-get upgrade -y && \
     git \
     python3-tk \
     libopenmpi-dev \
+    libaio-dev \
     ros-humble-navigation2 \
     ros-humble-nav2-bringup && \
     rm -rf /var/lib/apt/lists/*
@@ -104,6 +105,18 @@ RUN pip3 install --no-cache-dir \
     langchain_groq \
     langchain-deepseek \
     SpeechRecognition
+
+# ------------ Install TensorRT-LLM for High-Performance Inference
+# Install additional system dependencies for TensorRT-LLM
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openmpi-bin libopenmpi-dev git-lfs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install TensorRT-LLM runtime package (v0.11.0 for CUDA 12.2)
+RUN pip3 install --no-cache-dir tensorrt_llm==0.11.0 --extra-index-url https://pypi.nvidia.com
+
+# Note: TensorRT-LLM verification requires GPU runtime access
+# Verification will be done when the container starts with GPU support
 
 # ------------ Clean up
 RUN apt-get clean && \
