@@ -20,8 +20,8 @@ WORKDIR /root
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository universe && \
-    apt-get update && apt-get install -y curl && \
-    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    apt-get update && apt-get install -y curl gpg && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 # ------------ Build environment on Ubuntu
@@ -93,10 +93,17 @@ RUN pip3 install --no-cache-dir \
     pip3 install --no-cache-dir git+https://github.com/openai/CLIP.git && \
     pip3 install --no-cache-dir gradio
 
-# ------------ Additional Python packages
+# ------------ Additional Python packages (with version constraints)
 RUN pip3 install --no-cache-dir \
-    tqdm \
-    scipy
+    "numpy<1.25.0" \
+    "scipy>=1.8.0,<1.14.0" \
+    transforms3d==0.4.2 \
+    loguru \
+    langchain_openai \
+    langchain_anthropic \
+    langchain_groq \
+    langchain-deepseek \
+    SpeechRecognition
 
 # ------------ Clean up
 RUN apt-get clean && \
