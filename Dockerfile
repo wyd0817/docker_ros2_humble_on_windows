@@ -7,11 +7,22 @@ ENV DISPLAY=host.docker.internal:0.0
 ENV PULSE_SERVER=tcp:host.docker.internal:4713
 ENV DEBIAN_FRONTEND=noninteractive
 
-# ------------ Set timezone
-RUN apt-get update && \
+# ------------ Set timezone with automatic fallback to Japan mirror
+RUN { \
+    apt-get update && \
     apt-get install -y tzdata && \
     ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
-    dpkg-reconfigure --frontend noninteractive tzdata
+    dpkg-reconfigure --frontend noninteractive tzdata; \
+    } || { \
+    echo "⚠️ Failed with default Ubuntu mirrors" && \
+    echo "🔄 Switching to JAIST (Japan) mirror for better connectivity..." && \
+    sed -i 's@//.*archive.ubuntu.com@//ftp.jaist.ac.jp/pub/Linux@g' /etc/apt/sources.list && \
+    sed -i 's@//.*security.ubuntu.com@//ftp.jaist.ac.jp/pub/Linux@g' /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata; \
+    }
 
 # ------------ Set working directory
 WORKDIR /root
